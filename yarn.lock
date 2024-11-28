@@ -1393,6 +1393,26 @@
   resolved "https://registry.yarnpkg.com/@xtuc/long/-/long-4.2.2.tgz#d291c6a4e97989b5c61d9acf396ae4fe133a718d"
   integrity sha512-NuHqBY1PB/D8xU6s/thBgOAiAP7HOYDQ32+BFZILJ8ivkUkAHQnWfn6WhL79Owj1qmUnoN/YPhktdIoucipkAQ==
 
+"@zodash/base62@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@zodash/base62/-/base62-0.1.8.tgz#a00a9c3e802eba447ed9b40e823f7c600ec33cd9"
+  integrity sha512-NqkgPWjK+nX6WihZIZrqZfnxhbfQpxea29Iazv2tOV9EWKmwBP5ZQmnqqGFkN34XU0mitYF4Ex7aKTfLsgcajA==
+  dependencies:
+    "@zodash/basex" "^0.1.8"
+
+"@zodash/basex@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@zodash/basex/-/basex-0.1.8.tgz#008567fe61f9fe5952d310304cf04a85b06d7cfe"
+  integrity sha512-VPyOndpQ+Ue3quxl/Mssq+87ZUSmwKmtrPLC8tyuzoM0fJqN/eyVVhM9ET6GRcVgjB5Ah40kSllOlVfmWC+4qg==
+
+"@zodash/shorturl@^0.2.9":
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/@zodash/shorturl/-/shorturl-0.2.9.tgz#30f1869774e9ca347e5a9612fd3f93c3ea3e8a53"
+  integrity sha512-akxzJzKbM0WyWFQPiHLod6gwbPz8UFE2QZlH14o8CBjYfPN+/WL6VGrvMejpKVCZ8JEPn6jiHrMiAi0ZHo3UvQ==
+  dependencies:
+    "@zodash/base62" "^0.1.8"
+    murmurhash "^1.0.0"
+
 abbrev@1:
   version "1.1.1"
   resolved "https://registry.yarnpkg.com/abbrev/-/abbrev-1.1.1.tgz#f8f2c887ad10bf67f634f005b6987fed3179aac8"
@@ -3959,6 +3979,11 @@ multer@1.4.4-lts.1:
     type-is "^1.6.4"
     xtend "^4.0.0"
 
+murmurhash@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/murmurhash/-/murmurhash-1.0.0.tgz#d0e4556892317d984af632b6a88d5605beef26a7"
+  integrity sha512-u/NfpXS+viMWAupgU6IkwAVWkVnpvzS+D9bDxNuNRUoQ0BRMZ1DK/dPH6Qrknn7RxMHVQBpYBQQigUt7of6RiQ==
+
 mute-stream@0.0.8:
   version "0.0.8"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.8.tgz#1630c42b2251ff81e2a283de96a5497ea92e5e0d"
@@ -5115,6 +5140,11 @@ utils-merge@1.0.1, utils-merge@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/utils-merge/-/utils-merge-1.0.1.tgz#9f95710f50a267947b2ccc124741c1028427e713"
   integrity sha512-pMZTvIkT1d+TFGvDOqodOclx0QWkkgi6Tdoa8gC8ffGAAqz9pzPTZWAybbsHHoED/ztMtkv/VoYTYyShUn81hA==
+
+uuid@^11.0.3:
+  version "11.0.3"
+  resolved "https://registry.yarnpkg.com/uuid/-/uuid-11.0.3.tgz#248451cac9d1a4a4128033e765d137e2b2c49a3d"
+  integrity sha512-d0z310fCWv5dJwnX1Y/MncBAqGMKEzlBb1AOf7z9K8ALnd0utBX/msg/fA0+sbyN1ihbMsLhrBlnl1ak7Wa0rg==
 
 v8-compile-cache-lib@^3.0.1:
   version "3.0.1"

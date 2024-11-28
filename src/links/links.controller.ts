@@ -1,34 +1,40 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Post,
+  Res,
+} from '@nestjs/common';
+import { Response } from 'express';
+
 import { LinksService } from './links.service';
-import { CreateLinkDto } from './dto/create-link.dto';
-import { UpdateLinkDto } from './dto/update-link.dto';
 
 @Controller('links')
 export class LinksController {
   constructor(private readonly linksService: LinksService) {}
 
-  @Post()
-  create(@Body() createLinkDto: CreateLinkDto) {
-    return this.linksService.create(createLinkDto);
+  @Post('shorten')
+  async shorten(
+    @Body('url') url: string,
+    @Headers('Authorization') token: string,
+  ) {
+    return this.linksService.shortenUrl(url, token);
   }
 
-  @Get()
-  findAll() {
-    return this.linksService.findAll();
-  }
+  @Get(':shortUrl')
+  async redirect(
+    @Param('shortUrl') shortUrl: string,
+    @Res() res: Response,
+    @Headers('Authorization') token: string,
+  ) {
+    const longUrl = await this.linksService.getLongUrl(shortUrl, token);
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.linksService.findOne(+id);
-  }
+    if (longUrl) {
+      return res.redirect(longUrl);
+    }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateLinkDto: UpdateLinkDto) {
-    return this.linksService.update(+id, updateLinkDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.linksService.remove(+id);
+    return res.status(404).send('URL não encontrada');
   }
 }

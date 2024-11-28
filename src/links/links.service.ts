@@ -1,26 +1,74 @@
-import { Injectable } from '@nestjs/common';
-import { CreateLinkDto } from './dto/create-link.dto';
-import { UpdateLinkDto } from './dto/update-link.dto';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Link, User } from '@prisma/client';
+import { PrismaService } from 'src/prisma/prisma.service';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class LinksService {
-  create(createLinkDto: CreateLinkDto) {
-    return 'This action adds a new link';
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly jwtService: JwtService,
+  ) {}
+
+  async shortenUrl(url: string, token: string): Promise<string> {
+    let user: User | null = null;
+
+    if (token) {
+      const decodedToken = this.jwtService.decode(token.replace('Bearer ', ''));
+
+      const userEmail = decodedToken?.email;
+
+      if (userEmail) {
+        user = await this.prisma.user.findUnique({
+          where: { email: userEmail },
+        });
+      }
+    }
+
+    const shortUrl = uuidv4().slice(0, 6);
+
+    await this.prisma.link.create({
+      data: {
+        url,
+        shortUrl,
+        userId: user ? user.id : null,
+      },
+    });
+
+    return shortUrl;
   }
 
-  findAll() {
-    return `This action returns all links`;
-  }
+  async getLongUrl(shortUrl: string, token: string): Promise<string | null> {
+    const decodedToken = this.jwtService.decode(token?.replace('Bearer ', ''));
 
-  findOne(id: number) {
-    return `This action returns a #${id} link`;
-  }
+    const userEmail = decodedToken?.email;
 
-  update(id: number, updateLinkDto: UpdateLinkDto) {
-    return `This action updates a #${id} link`;
-  }
+    let link: Link | null = null;
 
-  remove(id: number) {
-    return `This action removes a #${id} link`;
+    if (userEmail) {
+      const user = await this.prisma.user.findUnique({
+        where: { email: userEmail },
+      });
+
+      if (!user) {
+        throw new HttpException(
+          'Usuário não encontrado',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+
+      link = await this.prisma.link.findFirst({
+        where: { shortUrl, userId: user.id },
+      });
+    }
+
+    if (!link) {
+      link = await this.prisma.link.findFirst({
+        where: { shortUrl },
+      });
+    }
+
+    return link?.url || null;
   }
 }
