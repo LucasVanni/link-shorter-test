@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - "${DB_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  dbeaver:
+    image: dbeaver/cloudbeaver:latest
+    container_name: dbeaver-link-shorter
+    environment:
+      CB_ADMIN_NAME: ${DBEAVER_ADMIN_NAME}
+      CB_ADMIN_PASSWORD: ${DBEAVER_ADMIN_PASSWORD}
+    ports:
+      - "5050:8978"
+
+volumes:
+  postgres_data:
