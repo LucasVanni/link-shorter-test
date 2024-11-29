@@ -15,12 +15,14 @@ datasource db {
 
 model Link {
   id        String   @id @default(cuid())
-  url       String
+  url       String   
   shortUrl  String
+  clicks    Int      @default(0)
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  deletedAt DateTime?
 }
 
 model User {
