@@ -5,23 +5,34 @@ import { UsersService } from './users.service';
 
 describe('UsersService', () => {
   let service: UsersService;
-  let prisma: PrismaService;
+
+  const mockPrismaService = {
+    user: {
+      findFirst: jest.fn(),
+      create: jest.fn(),
+      deleteMany: jest.fn(),
+    },
+    $connect: jest.fn(),
+    $disconnect: jest.fn(),
+  };
 
   beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [UsersService, PrismaService],
+      providers: [
+        UsersService,
+        { provide: PrismaService, useValue: mockPrismaService },
+      ],
     }).compile();
     service = module.get<UsersService>(UsersService);
-    prisma = module.get<PrismaService>(PrismaService);
-    await prisma.$connect();
+    await mockPrismaService.$connect();
   });
 
   afterEach(async () => {
-    await prisma.user.deleteMany(); // Limpa a tabela de usuários após cada teste
+    await mockPrismaService.user.deleteMany(); // Limpa a tabela de usuários após cada teste
   });
 
   afterAll(async () => {
-    await prisma.$disconnect();
+    await mockPrismaService.$disconnect();
   });
 
   it('should create a user', async () => {
@@ -35,8 +46,8 @@ describe('UsersService', () => {
       updatedAt: new Date(),
     };
 
-    jest.spyOn(prisma.user, 'findFirst').mockResolvedValue(null);
-    jest.spyOn(prisma.user, 'create').mockResolvedValue(userDto);
+    mockPrismaService.user.findFirst.mockResolvedValue(null);
+    mockPrismaService.user.create.mockResolvedValue(userDto);
 
     const result = await service.create(userDto);
     expect(result).toEqual({ message: 'user_created_success' });
@@ -52,7 +63,7 @@ describe('UsersService', () => {
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    jest.spyOn(prisma.user, 'findFirst').mockResolvedValue(userDto);
+    mockPrismaService.user.findFirst.mockResolvedValue(userDto);
     await expect(service.create(userDto)).rejects.toThrow(
       new HttpException('user_already_exist', HttpStatus.CONFLICT),
     );

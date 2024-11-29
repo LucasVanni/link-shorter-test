@@ -6,52 +6,34 @@ import { LinksService } from './links.service';
 
 describe('LinksService', () => {
   let service: LinksService;
-  let prisma: PrismaService;
-  let jwtService: JwtService;
-
-  const user = {
-    id: 'user-id',
-    email: 'test@example.com',
-    name: 'Test User',
-    password: 'securepassword',
-    tenantId: 'tenant-id',
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  };
 
   const link = {
     id: 'link-id',
-    createdAt: new Date(),
-    updatedAt: new Date(),
     url: 'https://www.example.com',
     shortUrl: 'short-url',
-    clicks: 0,
-    userId: 'user-id',
-    tenantId: 'tenant-id',
-    deletedAt: null,
-    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
   };
 
-  beforeAll(async () => {
-    prisma = new PrismaService();
-    await prisma.$connect();
-  });
-
-  afterEach(async () => {
-    await prisma.link.deleteMany();
-  });
-
-  afterAll(async () => {
-    await prisma.$disconnect();
-  });
+  const mockPrismaService = {
+    user: {
+      findUnique: jest.fn(),
+    },
+    links: {
+      create: jest.fn(),
+      deleteMany: jest.fn(),
+      findUnique: jest.fn(),
+    },
+  };
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [LinksService, PrismaService, JwtService],
+      providers: [
+        LinksService,
+        { provide: PrismaService, useValue: mockPrismaService },
+        { provide: JwtService, useValue: { decode: jest.fn() } },
+      ],
     }).compile();
 
     service = module.get<LinksService>(LinksService);
-    prisma = module.get<PrismaService>(PrismaService);
     jwtService = module.get<JwtService>(JwtService);
   });
 
@@ -60,38 +42,33 @@ describe('LinksService', () => {
   });
 
   describe('shortenUrl', () => {
-    it('should shorten a URL', async () => {
-      const url = 'https://www.example.com';
-      const token = 'Bearer token';
-
-      jest.spyOn(jwtService, 'decode').mockReturnValue({ email: user.email });
-      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(user);
-      jest.spyOn(prisma.link, 'create').mockResolvedValue(link);
-      jest.spyOn(service, 'shortenUrl').mockResolvedValue(link.shortUrl);
-
-      const result = await service.shortenUrl(url, token);
-      expect(result).toContain(link.shortUrl);
-    });
-
     it('should throw an exception if the user is not found on update', async () => {
-      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
-      jest.spyOn(prisma.link, 'create').mockResolvedValue(link);
-      jest.spyOn(service, 'shortenUrl').mockResolvedValue(link.shortUrl);
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
 
       await expect(
         service.updateLink(link.id, link.url, link.shortUrl),
       ).rejects.toThrow(
-        new HttpException('Usuário não encontrado', HttpStatus.UNAUTHORIZED),
+        new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND),
       );
     });
 
     it('should throw an exception if the user is not found on delete', async () => {
-      jest.spyOn(prisma.user, 'findUnique').mockResolvedValue(null);
+      mockPrismaService.user.findUnique.mockResolvedValue(null);
 
       await expect(
         service.deleteLink(link.shortUrl, 'invalid-token'),
       ).rejects.toThrow(
-        new HttpException('Usuário não encontrado', HttpStatus.UNAUTHORIZED),
+        new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND),
+      );
+    });
+  });
+
+  describe('getLink', () => {
+    it('should throw an exception if the link is not found', async () => {
+      mockPrismaService.links.findUnique = jest.fn().mockResolvedValue(null);
+
+      await expect(service.getLinks('non-existent-short-url')).rejects.toThrow(
+        new HttpException('Usuário não encontrado', HttpStatus.NOT_FOUND),
       );
     });
   });

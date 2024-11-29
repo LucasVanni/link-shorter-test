@@ -43,7 +43,11 @@ export class LinksService {
     });
   }
 
-  async shortenUrl(url: string, token: string, host?: string): Promise<string> {
+  async shortenUrl(
+    url: string,
+    token?: string,
+    host?: string,
+  ): Promise<string> {
     const domain = `http://${host || 'localhost:3000'}`;
 
     let user: User | null = null;
