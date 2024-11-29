@@ -70,6 +70,7 @@ export class LinksService {
           shortUrl,
           userId: user ? user.id : null,
           tenantId: user ? user.tenantId : null,
+          expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
         },
       });
 
@@ -80,6 +81,36 @@ export class LinksService {
         HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
+  }
+
+  async getLinkAnalytics(shortUrl: string, token: string) {
+    const decodedToken = this.jwtService.decode(token.replace('Bearer ', ''));
+    const userEmail = decodedToken?.email;
+
+    if (!userEmail) {
+      throw new HttpException(
+        'Usuário não encontrado',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+
+    const user = await this.prisma.user.findUnique({
+      where: { email: userEmail },
+    });
+
+    const link = await this.prisma.link.findFirst({
+      where: { shortUrl, userId: user.id },
+    });
+
+    if (!link) {
+      throw new HttpException('Link não encontrado', HttpStatus.NOT_FOUND);
+    }
+
+    return {
+      clicks: link.clicks,
+      createdAt: link.createdAt,
+      updatedAt: link.updatedAt,
+    };
   }
 
   async getLongUrl(shortUrl: string, token: string): Promise<string | null> {

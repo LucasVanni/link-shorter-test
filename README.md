@@ -91,6 +91,10 @@ http://localhost:3000/links/:id
 
 http://localhost:3000/links/:id
 
+### Listar analytics do link (GET)
+
+http://localhost:3000/links/analytics/:shortUrl
+
 ## Sugestões de Melhorias
 
 1. **Implementar testes automatizados**: Adicionar mais cobertura de testes unitários e de integração para garantir que todas as funcionalidades da aplicação estejam funcionando corretamente e para facilitar a manutenção do código.

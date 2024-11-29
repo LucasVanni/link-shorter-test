@@ -33,6 +33,14 @@ export class LinksController {
     return res.status(404).send('URL não encontrada');
   }
 
+  @Get('analytics/:shortUrl')
+  async getLinkAnalytics(
+    @Param('shortUrl') shortUrl: string,
+    @Headers('Authorization') token: string,
+  ) {
+    return this.linksService.getLinkAnalytics(shortUrl, token);
+  }
+
   @Get('')
   async getLinks(@Headers('Authorization') token: string) {
     return this.linksService.getLinks(token);
@@ -40,9 +48,9 @@ export class LinksController {
 
   @Post('shorten')
   async shorten(
-    @Body('url') url: string,
-    @Headers('Authorization') token: string,
     @Headers('host') host: string,
+    @Headers('Authorization') token: string,
+    @Body('url') url: string,
   ) {
     return this.linksService.shortenUrl(url, token, host);
   }

@@ -29,6 +29,7 @@ describe('LinksService', () => {
     userId: 'user-id',
     tenantId: 'tenant-id',
     deletedAt: null,
+    expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
   };
 
   beforeAll(async () => {
