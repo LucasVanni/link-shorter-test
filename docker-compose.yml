@@ -9,7 +9,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     ports:
-      - "${DB_PORT}:5432"
+      - '${DB_PORT}:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
@@ -20,7 +20,28 @@ services:
       CB_ADMIN_NAME: ${DBEAVER_ADMIN_NAME}
       CB_ADMIN_PASSWORD: ${DBEAVER_ADMIN_PASSWORD}
     ports:
-      - "5050:8978"
+      - '5050:8978'
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: app
+    environment:
+      DATABASE_URL: postgres://${DB_USER}:${DB_PASSWORD}@postgres:5432/${DB_NAME}
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: root
+      DB_PASSWORD: root
+      DB_NAME: link-shorter
+      JWT_SECRET_KEY: teste
+      JWT_EXPIRES_IN: '30 minutes'
+      DBEAVER_ADMIN_NAME: cbadmin
+      DBEAVER_ADMIN_PASSWORD: 040996Lv
+    depends_on:
+      - postgres
+    ports:
+      - '3000:3000'
 
 volumes:
   postgres_data:
