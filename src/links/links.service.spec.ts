@@ -34,7 +34,6 @@ describe('LinksService', () => {
     }).compile();
 
     service = module.get<LinksService>(LinksService);
-    jwtService = module.get<JwtService>(JwtService);
   });
 
   afterEach(() => {
