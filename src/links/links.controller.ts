@@ -9,9 +9,11 @@ import {
   Post,
   Res,
 } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { Response } from 'express';
 import { LinksService } from './links.service';
 
+@ApiTags('links')
 @Controller('links')
 export class LinksController {
   constructor(private readonly linksService: LinksService) {}

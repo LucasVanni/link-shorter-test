@@ -8,8 +8,8 @@ import {
 import { ApiTags } from '@nestjs/swagger';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LoginUserDto } from '../users/dto/login-user.dto';
-import { AuthService, RegistrationStatus } from './auth.service';
-
+import { AuthService } from './auth.service';
+import { IRegistrationStatus } from './interfaces/IRegistrationStatus';
 @ApiTags('auth')
 @Controller('auth')
 export class AuthController {
@@ -18,8 +18,8 @@ export class AuthController {
   @Post('register')
   public async register(
     @Body() createUserDto: CreateUserDto,
-  ): Promise<RegistrationStatus> {
-    const result: RegistrationStatus =
+  ): Promise<IRegistrationStatus> {
+    const result: IRegistrationStatus =
       await this.authService.register(createUserDto);
 
     if (!result.success) {

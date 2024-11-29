@@ -1,8 +1,8 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Link, User } from '@prisma/client';
-import { PrismaService } from 'src/prisma/prisma.service';
 import { v4 as uuidv4 } from 'uuid';
+import { PrismaService } from '../prisma/prisma.service';
 
 @Injectable()
 export class LinksService {
@@ -152,7 +152,7 @@ export class LinksService {
     });
   }
 
-  async deleteLink(shortUrl: string, token: string) {
+  async deleteLink(shortUrl: string, token?: string) {
     const decodedToken = this.jwtService.decode(token?.replace('Bearer ', ''));
 
     if (!decodedToken) {

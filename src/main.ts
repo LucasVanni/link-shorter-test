@@ -7,7 +7,7 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Link Shorter API')
-    .setDescription('The Link Shorter API description')
+    .setDescription('API para encurtar links')
     .setVersion('0.1')
     .build();
 
