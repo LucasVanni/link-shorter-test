@@ -30,6 +30,7 @@ describe('UsersService', () => {
       email: 'test@example.com',
       password: 'password',
       name: 'Test User',
+      tenantId: 'tenant-id',
       createdAt: new Date(),
       updatedAt: new Date(),
     };
@@ -46,6 +47,7 @@ describe('UsersService', () => {
       email: 'test@example.com',
       password: 'password',
       name: 'Test User',
+      tenantId: 'tenant-id',
       id: 'some-unique-id',
       createdAt: new Date(),
       updatedAt: new Date(),

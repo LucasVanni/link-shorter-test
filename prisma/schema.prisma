@@ -20,6 +20,7 @@ model Link {
   clicks    Int      @default(0)
   userId    String?
   user      User?    @relation(fields: [userId], references: [id])
+  tenantId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   deletedAt DateTime?
@@ -30,6 +31,7 @@ model User {
   email     String   @unique
   name      String
   password  String
+  tenantId  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   links     Link[]

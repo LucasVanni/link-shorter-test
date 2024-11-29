@@ -16,6 +16,9 @@ export class CreateUserDto {
   @ApiProperty({ example: '2024-01-01' })
   createdAt?: Date;
 
+  @ApiProperty({ example: 'tenant-id' })
+  tenantId: string;
+
   @ApiProperty({ example: '2024-01-01' })
   updatedAt?: Date;
 }

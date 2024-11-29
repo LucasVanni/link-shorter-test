@@ -28,7 +28,11 @@ export class LinksService {
     });
 
     return this.prisma.link.findMany({
-      where: { userId: user?.id, deletedAt: null },
+      where: {
+        userId: user?.id,
+        tenantId: user?.tenantId,
+        deletedAt: null,
+      },
       select: {
         clicks: true,
         shortUrl: true,
@@ -43,30 +47,39 @@ export class LinksService {
     const domain = `http://${host || 'localhost:3000'}`;
 
     let user: User | null = null;
+    try {
+      if (token) {
+        const decodedToken = this.jwtService.decode(
+          token.replace('Bearer ', ''),
+        );
 
-    if (token) {
-      const decodedToken = this.jwtService.decode(token.replace('Bearer ', ''));
+        const userEmail = decodedToken?.email;
 
-      const userEmail = decodedToken?.email;
-
-      if (userEmail) {
-        user = await this.prisma.user.findUnique({
-          where: { email: userEmail },
-        });
+        if (userEmail) {
+          user = await this.prisma.user.findUnique({
+            where: { email: userEmail },
+          });
+        }
       }
+
+      const shortUrl = uuidv4().slice(0, 6);
+
+      await this.prisma.link.create({
+        data: {
+          url,
+          shortUrl,
+          userId: user ? user.id : null,
+          tenantId: user ? user.tenantId : null,
+        },
+      });
+
+      return `${domain}/links/${shortUrl}`;
+    } catch {
+      throw new HttpException(
+        'Erro ao criar link',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
-
-    const shortUrl = uuidv4().slice(0, 6);
-
-    await this.prisma.link.create({
-      data: {
-        url,
-        shortUrl,
-        userId: user ? user.id : null,
-      },
-    });
-
-    return `${domain}/links/${shortUrl}`;
   }
 
   async getLongUrl(shortUrl: string, token: string): Promise<string | null> {
@@ -76,46 +89,53 @@ export class LinksService {
 
     let link: Link | null = null;
 
-    if (userEmail) {
-      const user = await this.prisma.user.findUnique({
-        where: { email: userEmail },
-      });
+    try {
+      if (userEmail) {
+        const user = await this.prisma.user.findUnique({
+          where: { email: userEmail },
+        });
 
-      if (!user) {
+        if (!user) {
+          throw new HttpException(
+            'Usuário não encontrado',
+            HttpStatus.UNAUTHORIZED,
+          );
+        }
+
+        link = await this.prisma.link.findFirst({
+          where: { shortUrl, userId: user.id },
+        });
+      }
+
+      if (!link) {
+        link = await this.prisma.link.findFirst({
+          where: { shortUrl },
+        });
+      }
+
+      if (link?.deletedAt) {
         throw new HttpException(
-          'Usuário não encontrado',
-          HttpStatus.UNAUTHORIZED,
+          'Link não encontrado! (deleted)',
+          HttpStatus.NOT_FOUND,
         );
       }
 
-      link = await this.prisma.link.findFirst({
-        where: { shortUrl, userId: user.id },
-      });
-    }
+      if (!link) {
+        throw new HttpException('Link não encontrado!', HttpStatus.NOT_FOUND);
+      }
 
-    if (!link) {
-      link = await this.prisma.link.findFirst({
-        where: { shortUrl },
+      await this.prisma.link.update({
+        where: { id: link?.id },
+        data: { clicks: { increment: 1 } },
       });
-    }
 
-    if (link?.deletedAt) {
+      return link?.url || null;
+    } catch {
       throw new HttpException(
-        'Link não encontrado! (deleted)',
-        HttpStatus.NOT_FOUND,
+        'Erro ao obter link',
+        HttpStatus.INTERNAL_SERVER_ERROR,
       );
     }
-
-    if (!link) {
-      throw new HttpException('Link não encontrado!', HttpStatus.NOT_FOUND);
-    }
-
-    await this.prisma.link.update({
-      where: { id: link?.id },
-      data: { clicks: { increment: 1 } },
-    });
-
-    return link?.url || null;
   }
 
   async updateLink(longUrl: string, shortUrl: string, token: string) {
@@ -144,12 +164,19 @@ export class LinksService {
       );
     }
 
-    await this.prisma.link.update({
-      where: { id: link?.id },
-      data: {
-        url: longUrl,
-      },
-    });
+    try {
+      await this.prisma.link.update({
+        where: { id: link?.id },
+        data: {
+          url: longUrl,
+        },
+      });
+    } catch {
+      throw new HttpException(
+        'Erro ao atualizar link',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   async deleteLink(shortUrl: string, token?: string) {
@@ -186,11 +213,18 @@ export class LinksService {
       );
     }
 
-    await this.prisma.link.update({
-      where: { id: link?.id },
-      data: {
-        deletedAt: new Date(),
-      },
-    });
+    try {
+      await this.prisma.link.update({
+        where: { id: link?.id },
+        data: {
+          deletedAt: new Date(),
+        },
+      });
+    } catch {
+      throw new HttpException(
+        'Erro ao deletar link',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

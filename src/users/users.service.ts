@@ -23,16 +23,23 @@ export class UsersService {
       throw new HttpException('user_already_exist', HttpStatus.CONFLICT);
     }
 
-    await this.prisma.user.create({
-      data: {
-        ...userDto,
-        password: await hash(userDto.password, 10),
-      },
-    });
+    try {
+      await this.prisma.user.create({
+        data: {
+          ...userDto,
+          password: await hash(userDto.password, 10),
+        },
+      });
 
-    return {
-      message: 'user_created_success',
-    };
+      return {
+        message: 'user_created_success',
+      };
+    } catch {
+      throw new HttpException(
+        'Erro ao criar usuário',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   //use by auth module to login user
@@ -60,8 +67,15 @@ export class UsersService {
 
   //use by auth module to get user in database
   async findByPayload({ email }: any): Promise<any> {
-    return await this.prisma.user.findFirst({
-      where: { email },
-    });
+    try {
+      return await this.prisma.user.findFirst({
+        where: { email },
+      });
+    } catch {
+      throw new HttpException(
+        'Erro ao obter usuário',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 }

@@ -14,6 +14,7 @@ describe('LinksService', () => {
     email: 'test@example.com',
     name: 'Test User',
     password: 'securepassword',
+    tenantId: 'tenant-id',
     createdAt: new Date(),
     updatedAt: new Date(),
   };
@@ -26,6 +27,7 @@ describe('LinksService', () => {
     shortUrl: 'short-url',
     clicks: 0,
     userId: 'user-id',
+    tenantId: 'tenant-id',
     deletedAt: null,
   };
 
