@@ -1,6 +1,6 @@
 
 
-## Para acessar a api e fazer as requests para a api hospedada na aws, requisitar com o seguinte endereço IP http://18.231.163.119:3000/ ao invés do localhost para os endpoints abaixo
+## Para acessar a api e fazer as requests para a api hospedada na aws, requisitar com o seguinte endereço IP http://18.231.163.119:3000/ ao invés do localhost para os [endpoints abaixo](#endpoints)
 
 
 # Autenticação API
