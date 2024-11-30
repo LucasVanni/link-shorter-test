@@ -29,16 +29,16 @@ npm install
 docker compose up -d
 ```
 
-4. Rode o prisma migrate para criar as tabelas no banco de dados:
-
-```bash
-npx prisma migrate dev
-```
-
-5. Rode o prisma generate para gerar os tipos do prisma:
+4. Rode o prisma generate para gerar os tipos do prisma:
 
 ```bash
 npx prisma generate
+```
+
+5. Rode o prisma migrate para criar as tabelas no banco de dados:
+
+```bash
+npx prisma migrate dev
 ```
 
 6. Rode o projeto no modo de desenvolvimento:
